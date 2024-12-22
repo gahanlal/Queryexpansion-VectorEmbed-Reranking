@@ -1,0 +1,71 @@
+
+Overview:
+This code leverages multiple advanced technologies to process a given user query, retrieve relevant information from a document, generate related questions and answers using OpenAIs GPT-3.5, and then rank these answers using the BM25 algorithm. The goal is to improve the accuracy and relevance of answers based on a document corpus.
+
+Libraries and Tools Used:
+OpenAI API: Used to generate questions, answers, and expand the queries using the GPT-3.5 model.
+LangChain: A framework for building language model pipelines, used here for document loading, retrieval, and combining models.
+FAISS (Facebook AI Similarity Search): An open-source library for fast similarity search of high-dimensional data. Used for indexing and retrieving relevant documents.
+Hugging Face Embeddings: Used to convert documents and queries into vector embeddings for semantic search.
+BM25: A traditional information retrieval algorithm used to rank text based on keyword matching, used here for reranking answers based on their relevance to the users query.
+Workflow Breakdown:
+Embedding and Document Loading:
+
+The code starts by loading a PDF document using PyPDFLoader from LangChain, which splits the document into individual pages for further processing.
+Hugging Face sentence-transformers/all-MiniLM-l6-v2 model is used to generate embeddings (vector representations) of the document content, which is necessary for efficient document retrieval.
+Document Retrieval with FAISS:
+
+The document pages are indexed using FAISS with the generated embeddings, allowing us to perform fast semantic searches (finding documents that are semantically relevant to a query).
+OpenAI Integration:
+
+OpenAIs GPT-3.5 model is used at various stages of the code:
+Question Expansion: The initial user query is expanded to make it more general, making it easier for the model to generate useful answers.
+Question Generation: Based on the original user query, the code generates additional questions that are semantically related to the query.
+Answer Generation: For each generated question, an answer is retrieved using the relevant document content.
+Context Retrieval:
+
+The get_context function retrieves the relevant content from the document using the FAISS index. This context is then used to answer the generated questions.
+BM25 Reranking:
+
+After generating answers for each question, the BM25 algorithm is applied to rank the answers based on their relevance to the original user query. BM25 scores are calculated for each generated answer, and the answers are reranked accordingly.
+Final Output:
+
+The top-ranked answer (from BM25 reranking) and the plain answer (directly generated without reranking) are printed for comparison.
+Functions in Detail:
+ask_question:
+
+This function takes a user query and asks GPT-3.5 to generate a step-back question (a more general version of the original query). The model responds with this paraphrased question.
+get_answer:
+
+This function sends the generated question and context to OpenAIs model, asking for an answer based on the retrieved document context.
+generate_expanded_query:
+
+This function asks GPT-3.5 to generate an expanded query based on the original query, which helps broaden the scope for finding relevant answers.
+generate_questions:
+
+It generates a list of relevant questions, starting with the original user query and then adding more questions based on the expanded query.
+generate_answers:
+
+For each question in the generated list, this function fetches answers based on the context retrieved from the document.
+rerank_answers:
+
+This function takes the user query and the generated answers, applies the BM25 algorithm, and returns a list of answers ranked by their relevance.
+get_context:
+
+Uses the FAISS retriever to find and return the most relevant document content for a given user query.
+Key Concepts:
+Embeddings: These are vector representations of text that capture the semantic meaning of words or documents. Embeddings are essential for tasks like document retrieval, where you want to find documents that are similar in meaning to a query.
+
+FAISS: This library allows for efficient similarity search and clustering of large datasets of embeddings. In this case, it’s used to quickly find relevant document pages from the indexed PDF content.
+
+BM25: BM25 is a probabilistic model that ranks documents based on term frequency and inverse document frequency (TF-IDF). It is used here to rank answers according to how well they match the expanded user query.
+
+Suggested Improvements:
+Error Handling: Currently, the code assumes that everything will work smoothly (e.g., document loading, query generation, etc.). It would be good to add error handling to manage possible failures (like API request failures).
+
+Efficiency: Each answer is generated sequentially. It might be optimized using asynchronous requests to improve performance when handling a larger number of queries or answers.
+
+Scalability: Currently, the code works with a single document (a PDF). If this needs to scale to multiple documents or larger datasets, the retrieval system may need to be optimized to handle larger volumes of data more efficiently.
+
+Conclusion:
+This code represents an advanced pipeline for processing natural language queries, expanding them, generating related questions and answers, and then ranking the answers based on their relevance using BM25. It integrates state-of-the-art technologies like GPT-3.5, FAISS, and Hugging Face embeddings to build a robust question-answering system based on document retrieval.
