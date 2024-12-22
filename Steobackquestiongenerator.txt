@@ -1,0 +1,13 @@
+The code generates and ranks questions based on a user query using OpenAI's API and BM25.
+
+1. ask_question: Takes a user query and asks OpenAI to generate a more general, paraphrased question and five related questions. The OpenAI model is prompted to create one generic question and five relevant questions for a given user query.
+
+2. generate_questions: Generates multiple (default 5) relevant questions by calling `ask_question` multiple times.
+
+3. main: The function that coordinates the process, generates questions for a given query, prints them, and reranks them using BM25.
+
+4. rerank_questions: Uses BM25 (a ranking algorithm) to reorder the generated questions based on relevance to the original user query. It scores each generated question and selects the top `num_rerank` questions with the highest scores.
+
+5. BM25: BM25 is a text ranking algorithm used to assess the relevance of documents to a query, helping reorder the generated questions based on how closely they match the original user query.
+
+In summary, the script first generates a set of related questions using OpenAI's API and then reranks them using the BM25 algorithm for better relevance.
